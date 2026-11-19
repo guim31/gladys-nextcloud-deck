@@ -179,6 +179,12 @@ export const ACTION_TEXT = {
     de: 'Kein Board in Deck hat diesen Namen (oder es wird nicht verfolgt).',
     es: 'Ningún tablero tiene este nombre en Deck (o no se sigue).',
   },
+  boardUnknown: {
+    en: 'No board has this name in Deck.',
+    fr: 'Aucun tableau ne porte ce nom dans Deck.',
+    de: 'Kein Board in Deck hat diesen Namen.',
+    es: 'Ningún tablero tiene este nombre en Deck.',
+  },
   boardAmbiguous: {
     en: 'Several boards have this name: give its id (in its address) instead.',
     fr: 'Plusieurs tableaux portent ce nom : indiquez plutôt son numéro (dans son adresse).',

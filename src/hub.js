@@ -569,7 +569,8 @@ export class DeckHub {
    *     into the past by hand is not a crossing: nothing fires for it.
    */
   async fireEvents(now) {
-    const scope = this.config.url;
+    // Another user on the same Nextcloud sees other cards: a new scope.
+    const scope = `${this.config.url}|${this.config.username}`;
     const lists = Object.fromEntries(this.cards.map((card) => [card.id, card.listId]));
     const boards = this.followed.map((board) => board.id);
     if (this.saved.scope !== scope || this.saved.readAt === 0) {
@@ -727,7 +728,7 @@ export class DeckHub {
     }
     const { item, reason } = findByIdOrName(boards, query);
     if (!item) {
-      throw this.fail(reason === 'ambiguous' ? 'boardAmbiguous' : 'boardNotFound');
+      throw this.fail(reason === 'ambiguous' ? 'boardAmbiguous' : 'boardUnknown');
     }
     return item;
   }
@@ -866,15 +867,26 @@ export class DeckHub {
   /** Mark a card done (the widget buttons). */
   async markDone(cardId) {
     const client = this.requireClient();
-    const card = this.cards.find((item) => item.id === cardId);
-    if (!card || !card.open) {
+    const known = this.cards.find((item) => item.id === cardId);
+    if (!known) {
       this.poll().catch(() => {});
-      throw this.fail('alreadyDone');
+      throw this.fail('cardNotFound');
     }
+    // The card may have moved since the last reading: its board is read again,
+    // so the update goes to its list of now (the URL's list is applied).
+    let card;
     try {
-      await client.markDone(card.boardId, card.listId, card.id, iso(this.now()));
+      const { cards } = parseStacks(known.boardId, await client.stacks(known.boardId));
+      card = cards.find((item) => item.id === cardId);
+      if (card?.open) {
+        await client.markDone(card.boardId, card.listId, card.id, iso(this.now()));
+      }
     } catch (err) {
       throw this.explain(err);
+    }
+    if (!card || !card.open) {
+      this.poll().catch(() => {});
+      throw this.fail(card ? 'alreadyDone' : 'cardNotFound');
     }
     logger.info(`Card ${card.id} marked done from Gladys`);
     await this.refreshSoon();

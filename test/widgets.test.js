@@ -118,6 +118,21 @@ test('a "done" button marks the card done, keeps the rest, answers a toast', asy
   assert.match(refused.error.de, /^Deck: /);
 });
 
+test('a card moved in Deck since the last reading is marked done in its new list', async (t) => {
+  const w = await world(t);
+  w.server.move('Arroser les plantes', '7');
+  const id = String(w.server.card('Arroser les plantes').id);
+  const ack = await w.fake.widgetAction('cards_today', 'done_3', { id }, { settings: {} });
+  assert.equal(ack.success, true, JSON.stringify(ack.error));
+  const card = w.server.card('Arroser les plantes');
+  assert.equal(card.stackId, 7, 'not put back in its old list');
+  assert.ok(card.done);
+  w.server.detach(w.server.card('Vidange'));
+  const gone = await w.fake.widgetAction('cards_today', 'done_1', { id: '6' }, { settings: {} });
+  assert.equal(gone.success, false);
+  assert.match(gone.error.en, /No card/);
+});
+
 test('the buttons can be hidden; boards are named as in Gladys', async (t) => {
   const w = await world(t);
   const data = await content(w, { show_buttons: false });

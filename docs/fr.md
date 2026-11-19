@@ -119,8 +119,10 @@ transmises aux actions : la carte, son numéro, son tableau, sa liste, son
 échéance.
 
 Une nouvelle carte ou un déplacement se voit à la lecture suivante : dans
-l'intervalle de rafraîchissement. Une carte sortie des archives, ou venue
-d'un autre tableau, n'est ni nouvelle ni déplacée, et les cartes d'un tableau
+l'intervalle de rafraîchissement. Une carte venue
+d'un autre tableau suivi n'est ni nouvelle ni déplacée ; une carte sortie des
+archives ou venue d'un tableau non suivi ne compte comme nouvelle que si elle
+a été créée moins d'une heure avant, et les cartes d'un tableau
 suivi à partir de maintenant ne sont pas des nouveautés. Une carte marquée
 comme faite avant son échéance ne déclenche rien, et une échéance déplacée à
 la main avant la lecture précédente non plus. Un redémarrage ne déclenche

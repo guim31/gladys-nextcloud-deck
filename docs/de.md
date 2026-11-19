@@ -116,8 +116,10 @@ weitergegebene Informationen: die Karte, ihre ID, ihr Board, ihre Liste,
 ihre Fälligkeit.
 
 Eine neue Karte oder eine Verschiebung wird beim nächsten Lesen erkannt:
-innerhalb des Aktualisierungsintervalls. Eine aus dem Archiv geholte oder aus
-einem anderen Board gekommene Karte ist weder neu noch verschoben, und die
+innerhalb des Aktualisierungsintervalls. Eine aus einem anderen verfolgten
+Board gekommene Karte ist weder neu noch verschoben; eine aus dem Archiv
+geholte oder aus einem nicht verfolgten Board gekommene Karte gilt nur als neu,
+wenn sie weniger als eine Stunde zuvor erstellt wurde, und die
 Karten eines ab jetzt verfolgten Boards sind keine Neuigkeit. Eine vor ihrer
 Fälligkeit erledigte Karte löst nichts aus, ebenso wenig eine Fälligkeit, die
 von Hand vor das vorherige Lesen verschoben wurde. Ein Neustart löst nichts

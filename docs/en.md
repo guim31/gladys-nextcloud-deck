@@ -101,8 +101,9 @@ Filters of the last two: the board, the card name. Information passed on to
 the actions: the card, its id, its board, its list, its due date.
 
 A new card or a move is seen at the next reading: within the refresh
-interval. A card brought back from the archive, or from another board, is
-neither new nor a move, and the cards of a board followed from now on are no
+interval. A card brought from another followed board is neither new nor a move; one
+brought back from the archive or from an unfollowed board counts as new only
+if it was created less than an hour before, and the cards of a board followed from now on are no
 news. A card marked done before its due time fires nothing, and a due date
 moved by hand to a moment before the previous reading fires nothing either. A
 restart does not fire anything twice; a card created or moved while the

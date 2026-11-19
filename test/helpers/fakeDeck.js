@@ -138,7 +138,10 @@ export class FakeDeck {
     }
     if (card) {
       const target = this.allCards().find((item) => item.id === Number(card[3]));
-      if (!visible(card[1]) || !target || target.stackId !== Number(card[2])) {
+      // The full update applies the list of its URL (CardService::update):
+      // a stale list puts the card back there.
+      const fullUpdate = method === 'PUT' && !card[4];
+      if (!visible(card[1]) || !target || (!fullUpdate && target.stackId !== Number(card[2]))) {
         return denied();
       }
       if (method === 'GET' && !card[4]) {
@@ -162,6 +165,10 @@ export class FakeDeck {
           if (!body?.[key]) {
             return json(400, { status: 400, message: `${key} must be provided` });
           }
+        }
+        if (target.stackId !== Number(card[2])) {
+          this.detach(target);
+          this.attach(target, card[2]);
         }
         Object.assign(target, {
           title: body.title,

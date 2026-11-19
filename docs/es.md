@@ -118,8 +118,9 @@ transmitida a las acciones: la tarjeta, su número, su tablero, su lista, su
 vencimiento.
 
 Una tarjeta nueva o un movimiento se ve en la siguiente lectura: dentro del
-intervalo de actualización. Una tarjeta sacada del archivo, o traída de otro
-tablero, no es nueva ni movida, y las tarjetas de un tablero seguido a partir
+intervalo de actualización. Una tarjeta traída de otro
+tablero seguido no es nueva ni movida; una sacada del archivo o traída de un
+tablero no seguido solo cuenta como nueva si se creó menos de una hora antes, y las tarjetas de un tablero seguido a partir
 de ahora no son novedad. Una tarjeta hecha antes de su vencimiento no
 dispara nada, y un vencimiento movido a mano antes de la lectura anterior
 tampoco. Un reinicio no dispara nada dos veces; una tarjeta creada (menos de

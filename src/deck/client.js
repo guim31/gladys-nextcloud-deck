@@ -202,7 +202,9 @@ export class DeckClient {
       throw new DeckError(ERROR_KINDS.NOT_DECK, 'no card in /cards', 200);
     }
     const owner = typeof card.owner === 'string' ? card.owner : card.owner?.uid;
-    return this.call(`/boards/${id(boardId)}/stacks/${id(stackId)}/cards/${id(cardId)}`, {
+    // The list in the URL is applied by Deck: the card's own, as just read.
+    const listId = card.stackId ?? stackId;
+    return this.call(`/boards/${id(boardId)}/stacks/${id(listId)}/cards/${id(cardId)}`, {
       method: 'PUT',
       json: {
         title: card.title,
