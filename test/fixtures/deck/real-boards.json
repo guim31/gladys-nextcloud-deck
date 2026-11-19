@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "title": "Personal",
+    "owner": {
+      "primaryKey": "alice",
+      "uid": "alice",
+      "displayname": "alice",
+      "type": 0
+    },
+    "color": "0087C5",
+    "archived": true,
+    "labels": [],
+    "acl": [],
+    "permissions": {
+      "PERMISSION_READ": true,
+      "PERMISSION_EDIT": true,
+      "PERMISSION_MANAGE": true,
+      "PERMISSION_SHARE": true
+    },
+    "users": [],
+    "shared": 0,
+    "stacks": [],
+    "activeSessions": [],
+    "deletedAt": 0,
+    "lastModified": 1795119596,
+    "settings": [],
+    "ETag": "43a381360fc29a0efa734d0dd105fe6f"
+  },
+  {
+    "id": 2,
+    "title": "Maison",
+    "owner": {
+      "primaryKey": "alice",
+      "uid": "alice",
+      "displayname": "alice",
+      "type": 0
+    },
+    "color": "ff0000",
+    "archived": false,
+    "labels": [],
+    "acl": [],
+    "permissions": {
+      "PERMISSION_READ": true,
+      "PERMISSION_EDIT": true,
+      "PERMISSION_MANAGE": true,
+      "PERMISSION_SHARE": true
+    },
+    "users": [],
+    "shared": 0,
+    "stacks": [],
+    "activeSessions": [],
+    "deletedAt": 0,
+    "lastModified": 1795119671,
+    "settings": [],
+    "ETag": "4ce34578bda479fa97c2947ab965bd8f"
+  },
+  {
+    "id": 3,
+    "title": "Courses",
+    "owner": {
+      "primaryKey": "alice",
+      "uid": "alice",
+      "displayname": "alice",
+      "type": 0
+    },
+    "color": "00ff00",
+    "archived": false,
+    "labels": [],
+    "acl": [],
+    "permissions": {
+      "PERMISSION_READ": true,
+      "PERMISSION_EDIT": true,
+      "PERMISSION_MANAGE": true,
+      "PERMISSION_SHARE": true
+    },
+    "users": [],
+    "shared": 0,
+    "stacks": [],
+    "activeSessions": [],
+    "deletedAt": 0,
+    "lastModified": 1795119672,
+    "settings": [],
+    "ETag": "e5bbc7242db36d46cff0a7ab96e2720f"
+  }
+]

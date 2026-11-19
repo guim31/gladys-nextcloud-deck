@@ -30,6 +30,19 @@ Gladys before reporting a problem.
 
 In scope: the code of this repository and the Docker image it publishes.
 
-Out of scope: Gladys Assistant itself (see its
-[security policy](https://github.com/GladysAssistant/Gladys/security/policy)),
-and the third-party services and devices the integration talks to.
+What the integration handles:
+
+- the **username and app password** of a Nextcloud user, stored by Gladys in
+  the integration configuration (`secret` field for the password), sent only
+  to the configured Nextcloud address (HTTP Basic authentication), and never
+  logged;
+- under `/data`, only `deck-state.json`: the configured address, the time of
+  the last reading, the ids of the followed boards and, for each followed
+  card, its id and the id of its list (no secret, no card name);
+- network: outgoing HTTP(S) requests to the configured Nextcloud address
+  only. With "Accept self-signed certificates" ticked, the certificate of
+  that address is not verified.
+
+Prefer an app password to the account password: it can be revoked in
+Nextcloud without changing the account password, and works with two-factor
+login.

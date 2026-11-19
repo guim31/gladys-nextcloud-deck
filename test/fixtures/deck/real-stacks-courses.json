@@ -1,0 +1,73 @@
+[
+  {
+    "id": 8,
+    "title": "Liste",
+    "boardId": 3,
+    "deletedAt": 0,
+    "lastModified": 1795119672,
+    "cards": [
+      {
+        "id": 13,
+        "title": "Pain",
+        "description": "",
+        "stackId": 8,
+        "type": "plain",
+        "lastModified": 1795119672,
+        "lastEditor": null,
+        "createdAt": 1795119672,
+        "labels": [],
+        "assignedUsers": [],
+        "attachments": null,
+        "attachmentCount": 0,
+        "owner": {
+          "primaryKey": "alice",
+          "uid": "alice",
+          "displayname": "alice",
+          "type": 0
+        },
+        "order": 0,
+        "archived": false,
+        "done": null,
+        "duedate": null,
+        "deletedAt": 0,
+        "commentsUnread": 0,
+        "commentsCount": 0,
+        "ETag": "e5bbc7242db36d46cff0a7ab96e2720f",
+        "overdue": 0,
+        "referenceData": null
+      },
+      {
+        "id": 14,
+        "title": "Lait",
+        "description": "",
+        "stackId": 8,
+        "type": "plain",
+        "lastModified": 1795119672,
+        "lastEditor": null,
+        "createdAt": 1795119672,
+        "labels": [],
+        "assignedUsers": [],
+        "attachments": null,
+        "attachmentCount": 0,
+        "owner": {
+          "primaryKey": "alice",
+          "uid": "alice",
+          "displayname": "alice",
+          "type": 0
+        },
+        "order": 1,
+        "archived": false,
+        "done": null,
+        "duedate": "2026-11-20T09:00:00+00:00",
+        "deletedAt": 0,
+        "commentsUnread": 0,
+        "commentsCount": 0,
+        "ETag": "e5bbc7242db36d46cff0a7ab96e2720f",
+        "overdue": 1,
+        "referenceData": null
+      }
+    ],
+    "order": 0,
+    "ETag": "e5bbc7242db36d46cff0a7ab96e2720f"
+  }
+]

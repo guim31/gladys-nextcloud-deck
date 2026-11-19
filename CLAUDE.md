@@ -16,8 +16,8 @@ its only runtime dependency. It started from the official JavaScript template.
 ```bash
 npm install
 npm test                                  # node --test, the built-in runner
-node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test test/hub.test.js              # one file
+node --test --test-name-pattern "move"    # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
@@ -31,16 +31,22 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: src/app.js registers the handlers before connect()
+src/app.js                        every SDK handler -> the hub (also used by the tests)
+src/hub.js                        reading timer, states, scene events, commands, deduplicated logs
+src/devices.js                    board devices: features, names (4 languages), states
+src/deck/client.js                Deck REST API v1.0 client (Basic auth + app password), errors by kind
+src/deck/http.js                  node:http/https request (self-signed certificates on request)
+src/deck/model.js                 boards, lists (stacks), cards; local day; counters; lookup by id or name
+src/scenes.js                     scene actions add_card, move_card, read_today
+src/widgets.js                    dashboard widget `cards_today` (manifest `widgets`)
+src/texts.js                      connection, error, report, action and toast texts (4 languages), ActionFailure
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/store.js                      /data/deck-state.json (instance, last reading, boards, list of each card)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (en and fr mandatory)
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+                                  and helpers/fakeDeck.js (built from test/fixtures/deck)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -58,7 +64,7 @@ test/                             node --test, against the SDK's fake Gladys (in
   one, `0`/`0` for a feature without a range (text, image...). A missing one
   can pass the publication on a core that does not check it, then fail when
   the user clicks "Add" (HTTP 422 `t_device_feature.min cannot be null`). The
-  SDK's fake Gladys refuses it on publication, and `test/devices.test.js`
+  SDK's fake Gladys refuses it on publication, and `test/gladys-rules.test.js`
   checks them.
 - **The container rootfs is read-only.** Write only under `/data`, the one
   writable volume. Never log tokens, passwords or API keys.
@@ -78,8 +84,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, widget content, feature names, manifest texts, and
+  `docs/{en,fr,de,es}.md`, kept in sync (`test/i18n.test.js`). A failed action
+  throws `ActionFailure` (shown in red), its message the four-language object.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -222,6 +230,29 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Les filtres de scène ne font qu'égalité et appartenance : un seuil reste le travail d'un capteur.
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
+
+## Nextcloud Deck (propre à ce dépôt)
+
+- **API** vérifiée sur `nextcloud:31-apache` (31.0.14) + Deck **1.15.12** (`occ app:install deck`) en Docker le
+  19/11/2026 (routes lues dans `appinfo/routes.php`, `lib/Controller/CardApiController.php`). Préfixe
+  `/index.php/apps/deck/api/v1.0` (marche avec ou sans « jolies URL »), Basic + `OCS-APIRequest: true`. Pour tester :
+  `SQLITE_DATABASE`, `NEXTCLOUD_ADMIN_USER/PASSWORD`, `NEXTCLOUD_TRUSTED_DOMAINS` = nom du conteneur ; mot de passe
+  d'application par `occ user:add-app-password <user>` ; Apache ne répond qu'après la fin de l'installation.
+- Deck dit « stacks » dans l'API et « listes » dans l'interface : le code dit `list`, `listId` = `stackId`.
+- `GET /boards` rend **aussi les tableaux archivés** (`archived: true`) **et ceux de la corbeille** (`deletedAt` ≠ 0) :
+  les filtrer. Un tableau inexistant ou non partagé répond **403 « Permission denied »**, pas 404.
+- `GET /boards/:b/stacks` : une liste **vide n'a pas de clé `cards`** ; les cartes archivées n'y sont pas. Une carte
+  faite garde sa liste, `done` = date ISO (Deck ≥ 1.13 ; absent avant : tout est ouvert). `createdAt` en secondes
+  (horloge du serveur). Ids entiers, gardés en chaînes dans le code. Plusieurs listes peuvent avoir le même `order` :
+  tri par `order` puis id.
+- **Marquer fait** : pas de mise à jour partielle. `PUT .../cards/:c` exige `title`, `type`, `owner` (uid) et remplace
+  description et échéance : relire la carte (`GET`) juste avant et tout renvoyer avec `done`. **Déplacer** :
+  `PUT .../cards/:c/reorder { stackId, order }`, simple.
+- Mauvais mot de passe : **401 `{"message":""}`** après un délai croissant (protection contre la force brute), puis 429. Après un 401/429, le hub attend l'intervalle de lecture et non 30 s. Sans Deck : page HTML 404 → `not_deck`.
+  Maintenance : 503.
+- « Nouvelle carte » (`card_created`) : id inconnu de la lecture précédente, dans un tableau déjà suivi (liste
+  `boards` de `/data/deck-state.json`), `createdAt` de moins d'une heure (une carte désarchivée n'est pas nouvelle).
+- Le module Nextcloud (supervision du serveur) est `guim31/gladys-nextcloud` : ici, l'application Deck seule.
 
 ## Store
 
